@@ -13,7 +13,7 @@ conexion = mysql.connector.connect(
 
 cursor = conexion.cursor()
 
-def resultadosContextoEquipoLocal(equipo, fecha):
+def contextoLocalFechaData(equipo, fecha):
     query = """
         SELECT resultados.*, posiciones.posicion
         FROM resultados
@@ -29,7 +29,7 @@ def resultadosContextoEquipoLocal(equipo, fecha):
     
     return resultados
     
-def resultadosContextoEquipoVisitante(equipo, fecha):
+def contextoVisitanteFechaData(equipo, fecha):
     query = """
         SELECT resultados.*, posiciones.posicion
         FROM resultados
@@ -45,7 +45,7 @@ def resultadosContextoEquipoVisitante(equipo, fecha):
     
     return resultados
 
-def posicionesAdversariosLocal(resultadosContextoVisitante):   
+def getContextoLocalFecha(resultadosContextoVisitante):   
     response = []
     for adversarioData in resultadosContextoVisitante:
         fecha = adversarioData[1]
@@ -76,22 +76,16 @@ def posicionesAdversariosLocal(resultadosContextoVisitante):
     
     return response
 
-def posicionesAdversariosVisitante(resultadosContextoVisitante):   
+def getContextoVisitanteFecha(resultadosContextoVisitante):   
     response = []
     for adversarioData in resultadosContextoVisitante:
         fecha = adversarioData[1]
         equipo = adversarioData[2]
         year = adversarioData[5]
 
-        cursor.execute("""
-            SELECT posicion
-            FROM posiciones
-            WHERE equipo = %s
-            AND fecha = %s
-            AND year = %s
-        """, (equipo, fecha, year))
+        cursor.execute(""" SELECT posicion FROM posiciones WHERE equipo = %s AND fecha = %s AND year = %s """, (equipo, fecha, year))
 
-        posicionAdversario, = cursor.fetchall()
+        posicionAdversario = cursor.fetchall()
         
         obj_response = {
             'year': adversarioData[5],
@@ -107,18 +101,47 @@ def posicionesAdversariosVisitante(resultadosContextoVisitante):
     
     return response
 
+def getContextoRivalida(equipoLocal, equipoVisitante):
+    query = """
+        SELECT 
+            resultados.*, 
+            posiciones_local.posicion AS local_posicion, 
+            posiciones_visitante.posicion AS visitante_posicion
+        FROM resultados
+        LEFT JOIN posiciones AS posiciones_local ON resultados.local = posiciones_local.equipo
+        LEFT JOIN posiciones AS posiciones_visitante ON resultados.visitante = posiciones_visitante.equipo
+        WHERE 
+            resultados.local = %s 
+            AND resultados.visitante = %s
+            AND resultados.fecha = posiciones_local.fecha
+            AND resultados.year = posiciones_local.year
+            AND resultados.fecha = posiciones_visitante.fecha
+            AND resultados.year = posiciones_visitante.year;
+    """
+
+    cursor.execute(query, (equipoLocal, equipoVisitante))
+    resultados = cursor.fetchall()
+    
+    return resultados
+    
+    
 try:
     fecha = 14
     equipoLocal = 'Cadiz'
+    equipoLocalPosicion = 16
     equipoVisitante = 'Real Madrid'
+    equipoVisitantePosicion = 2
     
-    contextoLocal = resultadosContextoEquipoLocal(equipoLocal, fecha)
-    contextoVisitante = resultadosContextoEquipoVisitante(equipoVisitante, fecha)
+    contextoLocalFecha = contextoLocalFechaData(equipoLocal, fecha)
+    contextoVisitanteFecha = contextoVisitanteFechaData(equipoVisitante, fecha)
     
-    resultadoContextoLocal = posicionesAdversariosLocal(contextoLocal)
-    resultadoContextoVisitante = posicionesAdversariosVisitante(contextoVisitante)
+    resultadoContextoLocalFecha = getContextoLocalFecha(contextoLocalFecha)
+    resultadoContextoVisitanteFecha = getContextoVisitanteFecha(contextoVisitanteFecha)
     
-    print(resultadoContextoVisitante)
+    """     
+    resultadoContextoRivalida = getContextoRivalida(equipoLocal, equipoVisitante)
+    print(resultadoContextoRivalida) 
+    """
     
 
 except mysql.connector.Error as err:
