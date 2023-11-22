@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import mysql.connector
 import json
+from prettytable import PrettyTable
 
 conexion = mysql.connector.connect(
     user='root', 
@@ -45,7 +46,7 @@ def contextoVisitanteFechaData(equipo, fecha):
     
     return resultados
 
-def getContextoLocalFecha(resultadosContextoVisitante):   
+def getContextoLocalFecha(resultadosContextoVisitante, equipoVisitantePosicion):   
     response = []
     for adversarioData in resultadosContextoVisitante:
         fecha = adversarioData[1]
@@ -61,22 +62,24 @@ def getContextoLocalFecha(resultadosContextoVisitante):
         """, (equipo, fecha, year))
 
         posicionAdversario, = cursor.fetchall()
-        
-        obj_response = {
-            'year': adversarioData[5],
-            'fecha': adversarioData[1],
-            'local': adversarioData[2],
-            'local_posicion': posicionAdversario,
-            'visitante': adversarioData[3],
-            'visitante_posicion': adversarioData[6],
-            'resultado': adversarioData[4]
-        } 
-        
-        response.append(obj_response)
+
+        if (int(posicionAdversario[0])  - equipoVisitantePosicion) > 10 :
+            obj_response = {
+                'year': adversarioData[5],
+                'fecha': adversarioData[1],
+                'local': adversarioData[2],
+                'local_posicion': posicionAdversario,
+                'visitante': adversarioData[3],
+                'visitante_posicion': adversarioData[6],
+                'resultado': adversarioData[4],
+                'contexto': 'local fecha'
+            } 
+            
+            response.append(obj_response)
     
     return response
 
-def getContextoVisitanteFecha(resultadosContextoVisitante):   
+def getContextoVisitanteFecha(resultadosContextoVisitante, equipoLocalPosicion):   
     response = []
     for adversarioData in resultadosContextoVisitante:
         fecha = adversarioData[1]
@@ -86,18 +89,21 @@ def getContextoVisitanteFecha(resultadosContextoVisitante):
         cursor.execute(""" SELECT posicion FROM posiciones WHERE equipo = %s AND fecha = %s AND year = %s """, (equipo, fecha, year))
 
         posicionAdversario = cursor.fetchall()
+        posicionAdversario_transform = posicionAdversario
+        posicionAdversario_clear = int(posicionAdversario_transform[0][0])
+        if (posicionAdversario_clear  - equipoVisitantePosicion) > 10:
+            obj_response = {
+                'year': adversarioData[5],
+                'fecha': adversarioData[1],
+                'local': adversarioData[2],
+                'local_posicion': posicionAdversario_clear,
+                'visitante': adversarioData[3],
+                'visitante_posicion': adversarioData[6],
+                'resultado': adversarioData[4],
+                'contexto': 'visitante fecha'
+            } 
         
-        obj_response = {
-            'year': adversarioData[5],
-            'fecha': adversarioData[1],
-            'local': adversarioData[2],
-            'local_posicion': posicionAdversario,
-            'visitante': adversarioData[3],
-            'visitante_posicion': adversarioData[6],
-            'resultado': adversarioData[4]
-        } 
-        
-        response.append(obj_response)
+            response.append(obj_response)
     
     return response
 
@@ -121,8 +127,23 @@ def getContextoRivalida(equipoLocal, equipoVisitante):
 
     cursor.execute(query, (equipoLocal, equipoVisitante))
     resultados = cursor.fetchall()
+    response = []
     
-    return resultados
+    for resultado in resultados:
+        obj_response = {
+            'year': resultado[5],
+            'fecha': resultado[1],
+            'local': resultado[2],
+            'local_posicion': resultado[6],
+            'visitante': resultado[3],
+            'visitante_posicion': resultado[7],
+            'resultado': resultado[4],
+            'contexto': 'rivalida'
+        } 
+        
+        response.append(obj_response)
+    
+    return response
     
     
 try:
@@ -135,13 +156,43 @@ try:
     contextoLocalFecha = contextoLocalFechaData(equipoLocal, fecha)
     contextoVisitanteFecha = contextoVisitanteFechaData(equipoVisitante, fecha)
     
-    resultadoContextoLocalFecha = getContextoLocalFecha(contextoLocalFecha)
-    resultadoContextoVisitanteFecha = getContextoVisitanteFecha(contextoVisitanteFecha)
-    
-    """     
+    resultadoContextoLocalFecha = getContextoLocalFecha(contextoLocalFecha, equipoVisitantePosicion)
+    resultadoContextoVisitanteFecha = getContextoVisitanteFecha(contextoVisitanteFecha, equipoLocalPosicion) 
+
     resultadoContextoRivalida = getContextoRivalida(equipoLocal, equipoVisitante)
-    print(resultadoContextoRivalida) 
+    
+    todos = resultadoContextoLocalFecha + resultadoContextoVisitanteFecha + resultadoContextoRivalida
+    partido = {
+        'local': equipoLocal,
+        'visitante': equipoVisitante,
+        'resultado': '',
+        'porcentaje': '',
+        'count': len(todos)
+    }
+    
+    for row in todos:
+        print(row)
+            
+
+
+    """   
+    tabla = PrettyTable()
+    if len(resultadoContextoLocalFecha) > 0:
+        tabla.field_names = resultadoContextoLocalFecha[0].keys()
+    if len(resultadoContextoVisitanteFecha) > 0:
+        tabla.field_names = resultadoContextoVisitanteFecha[0].keys()
+    if len(resultadoContextoRivalida) > 0:
+        tabla.field_names = resultadoContextoRivalida[0].keys()  
+    for resultado in resultadoContextoLocalFecha:
+        tabla.add_row(resultado.values())
+    for resultado in resultadoContextoVisitanteFecha:
+        tabla.add_row(resultado.values())
+    for resultado in resultadoContextoRivalida:
+        tabla.add_row(resultado.values()) 
+        
+    print(tabla)
     """
+
     
 
 except mysql.connector.Error as err:
