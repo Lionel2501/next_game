@@ -14,64 +14,123 @@ conexion = mysql.connector.connect(
 
 cursor = conexion.cursor()
 
-def contextoLocalFechaData(equipo, fecha):
+def contextoLocalFechaData(equipo, fecha, posicion_local, posicion_visitante):
+    fecha_l_1 = fecha - 1
+    fecha_l_1 = str(fecha_l_1)
+    fecha_l_2 = fecha - 2
+    fecha_l_2 = str(fecha_l_2)
+    fecha_l_3 = fecha - 3
+    fecha_l_3 = str(fecha_l_3)
+    fecha_m_1 = fecha + 1
+    fecha_m_1 = str(fecha_m_1)
+    fecha_m_2 = fecha + 2
+    fecha_m_2 = str(fecha_m_2)
+    fecha_m_3 = fecha + 3
+    fecha_m_3 = str(fecha_m_3)
+    
+    posicion_local_menos_1 = posicion_local - 1
+    posicion_local_menos_1 = str(posicion_local_menos_1)
+    posicion_local_menos_2 = posicion_local - 2
+    posicion_local_menos_2 = str(posicion_local_menos_2)
+    posicion_local_mas_1 = posicion_local + 1
+    posicion_local_mas_1 = str(posicion_local_mas_1)
+    posicion_local_mas_2 = posicion_local + 2
+    posicion_local_mas_2 = str(posicion_local_mas_2)
+    
+    posicion_visitante_menos_1 = posicion_visitante - 1
+    posicion_visitante_menos_1 = str(posicion_visitante_menos_1)
+    posicion_visitante_menos_2 = posicion_visitante - 2
+    posicion_visitante_menos_2 = str(posicion_visitante_menos_2)
+    posicion_visitante_mas_1 = posicion_visitante + 1
+    posicion_visitante_mas_1 = str(posicion_visitante_mas_1)
+    posicion_visitante_mas_2 = posicion_visitante + 2
+    posicion_visitante_mas_2 = str(posicion_visitante_mas_2)
+    
+    
     query = """
-        SELECT resultados.*, posiciones.posicion
-        FROM resultados
-        JOIN posiciones ON resultados.local = posiciones.equipo
-        WHERE resultados.local = %s
-            AND resultados.fecha = %s
-            AND posiciones.fecha = %s
-            AND resultados.year = posiciones.year
+        SELECT liga.*
+        FROM liga
+        WHERE liga.local = %s
+            AND (liga.fecha = %s OR liga.fecha = %s OR liga.fecha = %s  OR liga.fecha = %s  OR liga.fecha = %s  OR liga.fecha = %s  OR liga.fecha = %s)
+            AND (liga.local_posicion = %s OR liga.local_posicion = %s OR liga.local_posicion = %s OR liga.local_posicion = %s OR liga.local_posicion = %s)
+            AND (liga.visitante_posicion = %s OR liga.visitante_posicion = %s OR liga.visitante_posicion = %s OR liga.visitante_posicion = %s OR liga.visitante_posicion = %s)
     """
-
-    cursor.execute(query, (equipo, fecha, fecha))
+    """
+    fecha_arr = [fecha_l_1, fecha_l_2, fecha_l_3, fecha_m_1, fecha_m_2, fecha_m_3]
+    fechas_tuple = tuple(fecha_arr,) 
+    """
+    cursor.execute(query, (equipo, 
+        fecha_l_3, fecha_l_2, fecha_l_1, fecha, fecha_m_1, fecha_m_2, fecha_m_3, 
+        posicion_local_menos_2, posicion_local_menos_1, posicion_local, posicion_local_mas_1, posicion_local_mas_2, 
+        posicion_visitante_menos_2, posicion_visitante_menos_1, posicion_visitante, posicion_visitante_mas_1, posicion_visitante_mas_2))
     resultados = cursor.fetchall()
     
     return resultados
     
-def contextoVisitanteFechaData(equipo, fecha):
+def contextoVisitanteFechaData(equipo, fecha, posicion_local, posicion_visitante):
+    fecha_l_1 = fecha - 1
+    fecha_l_1 = str(fecha_l_1)
+    fecha_l_2 = fecha - 2
+    fecha_l_2 = str(fecha_l_2)
+    fecha_l_3 = fecha - 3
+    fecha_l_3 = str(fecha_l_3)
+    fecha_m_1 = fecha + 1
+    fecha_m_1 = str(fecha_m_1)
+    fecha_m_2 = fecha + 2
+    fecha_m_2 = str(fecha_m_2)
+    fecha_m_3 = fecha + 3
+    fecha_m_3 = str(fecha_m_3)
+    
+    posicion_local_menos_1 = posicion_local - 1
+    posicion_local_menos_1 = str(posicion_local_menos_1)
+    posicion_local_menos_2 = posicion_local - 2
+    posicion_local_menos_2 = str(posicion_local_menos_2)
+    posicion_local_mas_1 = posicion_local + 1
+    posicion_local_mas_1 = str(posicion_local_mas_1)
+    posicion_local_mas_2 = posicion_local + 2
+    posicion_local_mas_2 = str(posicion_local_mas_2)
+    
+    posicion_visitante_menos_1 = posicion_visitante - 1
+    posicion_visitante_menos_1 = str(posicion_visitante_menos_1)
+    posicion_visitante_menos_2 = posicion_visitante - 2
+    posicion_visitante_menos_2 = str(posicion_visitante_menos_2)
+    posicion_visitante_mas_1 = posicion_visitante + 1
+    posicion_visitante_mas_1 = str(posicion_visitante_mas_1)
+    posicion_visitante_mas_2 = posicion_visitante + 2
+    posicion_visitante_mas_2 = str(posicion_visitante_mas_2)
+    
+    
     query = """
-        SELECT resultados.*, posiciones.posicion
-        FROM resultados
-        JOIN posiciones ON resultados.visitante = posiciones.equipo
-        WHERE resultados.visitante = %s
-            AND resultados.fecha = %s
-            AND posiciones.fecha = %s
-            AND resultados.year = posiciones.year
+        SELECT liga.*
+        FROM liga
+        WHERE liga.visitante = %s
+            AND (liga.fecha = %s OR liga.fecha = %s OR liga.fecha = %s  OR liga.fecha = %s  OR liga.fecha = %s  OR liga.fecha = %s  OR liga.fecha = %s)
+            AND (liga.local_posicion = %s OR liga.local_posicion = %s OR liga.local_posicion = %s OR liga.local_posicion = %s OR liga.local_posicion = %s)
+            AND (liga.visitante_posicion = %s OR liga.visitante_posicion = %s OR liga.visitante_posicion = %s OR liga.visitante_posicion = %s OR liga.visitante_posicion = %s)
     """
-
-    cursor.execute(query, (equipo, fecha, fecha))
+    """
+    fecha_arr = [fecha_l_1, fecha_l_2, fecha_l_3, fecha_m_1, fecha_m_2, fecha_m_3]
+    fechas_tuple = tuple(fecha_arr,) 
+    """
+    cursor.execute(query, (equipo, 
+        fecha_l_3, fecha_l_2, fecha_l_1, fecha, fecha_m_1, fecha_m_2, fecha_m_3, 
+        posicion_local_menos_2, posicion_local_menos_1, posicion_local, posicion_local_mas_1, posicion_local_mas_2, 
+        posicion_visitante_menos_2, posicion_visitante_menos_1, posicion_visitante, posicion_visitante_mas_1, posicion_visitante_mas_2))
     resultados = cursor.fetchall()
     
     return resultados
 
-def getContextoLocalFecha(resultadosContextoVisitante, equipoVisitantePosicion):   
+def getContextoLocalFecha(resultadosContextoVisitante):   
     response = []
-    for adversarioData in resultadosContextoVisitante:
-        fecha = adversarioData[1]
-        equipo = adversarioData[2]
-        year = adversarioData[5]
-
-        cursor.execute("""
-            SELECT posicion
-            FROM posiciones
-            WHERE equipo = %s
-            AND fecha = %s
-            AND year = %s
-        """, (equipo, fecha, year))
-
-        posicionAdversario, = cursor.fetchall()
-
-        if (int(posicionAdversario[0])  - equipoVisitantePosicion) > 10 :
+    for data in resultadosContextoVisitante:
             obj_response = {
-                'year': adversarioData[5],
-                'fecha': adversarioData[1],
-                'local': adversarioData[2],
-                'local_posicion': posicionAdversario,
-                'visitante': adversarioData[3],
-                'visitante_posicion': adversarioData[6],
-                'resultado': adversarioData[4],
+                'year': data[7],
+                'fecha': data[1],
+                'local': data[2],
+                'local_posicion': data[3],
+                'visitante': data[4],
+                'visitante_posicion': data[5],
+                'resultado': data[6],
                 'contexto': 'local fecha'
             } 
             
@@ -79,121 +138,140 @@ def getContextoLocalFecha(resultadosContextoVisitante, equipoVisitantePosicion):
     
     return response
 
-def getContextoVisitanteFecha(resultadosContextoVisitante, equipoLocalPosicion):   
+def getContextoVisitanteFecha(resultadosContextoVisitante):   
     response = []
-    for adversarioData in resultadosContextoVisitante:
-        fecha = adversarioData[1]
-        equipo = adversarioData[2]
-        year = adversarioData[5]
-
-        cursor.execute(""" SELECT posicion FROM posiciones WHERE equipo = %s AND fecha = %s AND year = %s """, (equipo, fecha, year))
-
-        posicionAdversario = cursor.fetchall()
-        posicionAdversario_transform = posicionAdversario
-        posicionAdversario_clear = int(posicionAdversario_transform[0][0])
-        if (posicionAdversario_clear  - equipoVisitantePosicion) > 10:
+    for data in resultadosContextoVisitante:
             obj_response = {
-                'year': adversarioData[5],
-                'fecha': adversarioData[1],
-                'local': adversarioData[2],
-                'local_posicion': posicionAdversario_clear,
-                'visitante': adversarioData[3],
-                'visitante_posicion': adversarioData[6],
-                'resultado': adversarioData[4],
+                'year': data[7],
+                'fecha': data[1],
+                'local': data[2],
+                'local_posicion': data[3],
+                'visitante': data[4],
+                'visitante_posicion': data[5],
+                'resultado': data[6],
                 'contexto': 'visitante fecha'
             } 
-        
+            
             response.append(obj_response)
     
     return response
 
-def getContextoRivalida(equipoLocal, equipoVisitante):
+def getContextoRivalida(equipoLocal, equipoVisitante):    
     query = """
-        SELECT 
-            resultados.*, 
-            posiciones_local.posicion AS local_posicion, 
-            posiciones_visitante.posicion AS visitante_posicion
-        FROM resultados
-        LEFT JOIN posiciones AS posiciones_local ON resultados.local = posiciones_local.equipo
-        LEFT JOIN posiciones AS posiciones_visitante ON resultados.visitante = posiciones_visitante.equipo
-        WHERE 
-            resultados.local = %s 
-            AND resultados.visitante = %s
-            AND resultados.fecha = posiciones_local.fecha
-            AND resultados.year = posiciones_local.year
-            AND resultados.fecha = posiciones_visitante.fecha
-            AND resultados.year = posiciones_visitante.year;
+        SELECT liga.*
+        FROM liga
+        WHERE liga.local = %s AND liga.visitante = %s 
     """
-
+    
     cursor.execute(query, (equipoLocal, equipoVisitante))
     resultados = cursor.fetchall()
-    response = []
     
-    for resultado in resultados:
-        obj_response = {
-            'year': resultado[5],
-            'fecha': resultado[1],
-            'local': resultado[2],
-            'local_posicion': resultado[6],
-            'visitante': resultado[3],
-            'visitante_posicion': resultado[7],
-            'resultado': resultado[4],
-            'contexto': 'rivalida'
-        } 
-        
-        response.append(obj_response)
+    response = []
+    for data in resultados:
+            obj_response = {
+                'year': data[7],
+                'fecha': data[1],
+                'local': data[2],
+                'local_posicion': data[3],
+                'visitante': data[4],
+                'visitante_posicion': data[5],
+                'resultado': data[6],
+                'contexto': 'rivalida'
+            } 
+            
+            response.append(obj_response)
     
     return response
-    
-    
-try:
-    fecha = 14
-    equipoLocal = 'Cadiz'
-    equipoLocalPosicion = 16
-    equipoVisitante = 'Real Madrid'
-    equipoVisitantePosicion = 2
-    
-    contextoLocalFecha = contextoLocalFechaData(equipoLocal, fecha)
-    contextoVisitanteFecha = contextoVisitanteFechaData(equipoVisitante, fecha)
-    
-    resultadoContextoLocalFecha = getContextoLocalFecha(contextoLocalFecha, equipoVisitantePosicion)
-    resultadoContextoVisitanteFecha = getContextoVisitanteFecha(contextoVisitanteFecha, equipoLocalPosicion) 
 
-    resultadoContextoRivalida = getContextoRivalida(equipoLocal, equipoVisitante)
-    
-    todos = resultadoContextoLocalFecha + resultadoContextoVisitanteFecha + resultadoContextoRivalida
-    partido = {
-        'local': equipoLocal,
-        'visitante': equipoVisitante,
-        'resultado': '',
-        'porcentaje': '',
-        'count': len(todos)
+def getResultadoFinal(equipoLocal, equipoVisitante, todos):
+    countLocal = {
+        'count': 0,
+        'equipo': equipoLocal
+    }
+    countEmpate = {
+        'count': 0,
+        'equipo': 'empate'
+    }
+    countVisitante = {
+        'count': 0,
+        'equipo': equipoVisitante
     }
     
     for row in todos:
-        print(row)
+        resultado = row['resultado']
+        partes = resultado.split(' - ')
+        resultadoLocal = partes[0]
+        resultadoVisitante = partes[1]
+        resultadoLocal = int(resultadoLocal)
+        resultadoVisitante = int(resultadoVisitante)
+        
+        if resultadoLocal > resultadoVisitante:
+            countLocal['count'] += 1
+        if resultadoVisitante > resultadoLocal:
+            countVisitante['count'] += 1
+        if resultadoLocal == resultadoVisitante:
+            countEmpate['count'] += 1
             
+    mayor_count = max(countEmpate['count'], countLocal['count'], countVisitante['count'])
+    resultado = 'empate'
+    if mayor_count == countLocal['count']:
+        resultado = countLocal['equipo']
+    if mayor_count == countVisitante['count']:
+        resultado = countVisitante['equipo']
+        
+    total = len(todos)
+    porcentaje_calcul = mayor_count / total * 100
+    porcentaje_round = round(porcentaje_calcul, 2)
+    porcentaje_string = str(porcentaje_round) + '%'
+    
+    partido = {
+        'local': equipoLocal,
+        'visitante': equipoVisitante,
+        'resultado': resultado,
+        'porcentaje': porcentaje_string,
+        'resultado_local': countLocal['count'],
+        'resultado_empate': countEmpate['count'],
+        'resultado_visitante': countVisitante['count'],
+        'count': total
+    }
+    
+    return partido
+    
+try:
+    fecha = 14
+    equipoLocal = 'Atletico'
+    equipoLocalPosicion = 4
+    equipoVisitante = 'mallorca'
+    equipoVisitantePosicion = 17
+    
+    contextoLocalFecha = contextoLocalFechaData(equipoLocal, fecha, equipoLocalPosicion, equipoVisitantePosicion)
+    resultadoContextoLocalFecha = getContextoLocalFecha(contextoLocalFecha)
+    
+    contextoVisitanteFecha = contextoVisitanteFechaData(equipoVisitante, fecha, equipoLocalPosicion, equipoVisitantePosicion)
+    resultadoContextoVisitanteFecha = getContextoVisitanteFecha(contextoVisitanteFecha) 
 
+    resultadoContextoRivalida = getContextoRivalida(equipoLocal, equipoVisitante)
 
-    """   
+    
+    todos = resultadoContextoLocalFecha + resultadoContextoVisitanteFecha + resultadoContextoRivalida
+    
+    """ resultadoFinal = getResultadoFinal(equipoLocal, equipoVisitante, todos) """
+
     tabla = PrettyTable()
     if len(resultadoContextoLocalFecha) > 0:
         tabla.field_names = resultadoContextoLocalFecha[0].keys()
     if len(resultadoContextoVisitanteFecha) > 0:
         tabla.field_names = resultadoContextoVisitanteFecha[0].keys()
-    if len(resultadoContextoRivalida) > 0:
-        tabla.field_names = resultadoContextoRivalida[0].keys()  
+        
     for resultado in resultadoContextoLocalFecha:
         tabla.add_row(resultado.values())
     for resultado in resultadoContextoVisitanteFecha:
         tabla.add_row(resultado.values())
     for resultado in resultadoContextoRivalida:
-        tabla.add_row(resultado.values()) 
-        
-    print(tabla)
-    """
+        tabla.add_row(resultado.values())  
 
-    
+    print(tabla) 
+        
 
 except mysql.connector.Error as err:
     print("Error de MySQL: {err}")
