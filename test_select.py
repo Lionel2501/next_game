@@ -235,14 +235,15 @@ def getResultadoFinal(equipoLocal, equipoVisitante, todos):
         'count': total
     }
     
+    
     return partido
     
 try:
     fecha = 14
-    equipoLocal = 'Atletico'
-    equipoLocalPosicion = 4
-    equipoVisitante = 'mallorca'
-    equipoVisitantePosicion = 17
+    equipoLocal = 'Valencia'
+    equipoLocalPosicion = 9
+    equipoVisitante = 'granada'
+    equipoVisitantePosicion = 19
     
     contextoLocalFecha = contextoLocalFechaData(equipoLocal, fecha, equipoLocalPosicion, equipoVisitantePosicion)
     resultadoContextoLocalFecha = getContextoLocalFecha(contextoLocalFecha)
@@ -255,7 +256,7 @@ try:
     
     todos = resultadoContextoLocalFecha + resultadoContextoVisitanteFecha + resultadoContextoRivalida
     
-    """ resultadoFinal = getResultadoFinal(equipoLocal, equipoVisitante, todos) """
+    resultadoFinal = getResultadoFinal(equipoLocal, equipoVisitante, todos)
 
     tabla = PrettyTable()
     if len(resultadoContextoLocalFecha) > 0:
@@ -271,6 +272,7 @@ try:
         tabla.add_row(resultado.values())  
 
     print(tabla) 
+    print(resultadoFinal) 
         
 
 except mysql.connector.Error as err:
