@@ -14,6 +14,17 @@ conexion = mysql.connector.connect(
 
 cursor = conexion.cursor()
 
+def getPartidosDelDia(fecha):
+    query = """
+        SELECT resultados.local, resultados.visitante
+        FROM resultados
+        WHERE fecha = %s AND year = "2023-2024"
+    """
+    cursor.execute(query, (fecha,))
+    resultados = cursor.fetchall()
+    
+    return resultados
+    
 def contextoLocalFechaData(equipo, fecha, posicion_local, posicion_visitante):
     fecha_l_1 = fecha - 1
     fecha_l_1 = str(fecha_l_1)
@@ -239,11 +250,15 @@ def getResultadoFinal(equipoLocal, equipoVisitante, todos):
     return partido
     
 try:
+    partidosDelDia = getPartidosDelDia('14')
+    
+    print(partidosDelDia)
+    """
     fecha = 14
-    equipoLocal = 'Valencia'
+    equipoLocal = 'valencia'
     equipoLocalPosicion = 9
-    equipoVisitante = 'granada'
-    equipoVisitantePosicion = 19
+    equipoVisitante = 'celta'
+    equipoVisitantePosicion = 18
     
     contextoLocalFecha = contextoLocalFechaData(equipoLocal, fecha, equipoLocalPosicion, equipoVisitantePosicion)
     resultadoContextoLocalFecha = getContextoLocalFecha(contextoLocalFecha)
@@ -252,7 +267,6 @@ try:
     resultadoContextoVisitanteFecha = getContextoVisitanteFecha(contextoVisitanteFecha) 
 
     resultadoContextoRivalida = getContextoRivalida(equipoLocal, equipoVisitante)
-
     
     todos = resultadoContextoLocalFecha + resultadoContextoVisitanteFecha + resultadoContextoRivalida
     
@@ -273,7 +287,7 @@ try:
 
     print(tabla) 
     print(resultadoFinal) 
-        
+    """
 
 except mysql.connector.Error as err:
     print("Error de MySQL: {err}")
