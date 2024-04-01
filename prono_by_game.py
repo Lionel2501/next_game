@@ -1,8 +1,7 @@
-import requests 
-from bs4 import BeautifulSoup
 import mysql.connector
-import json
 from prettytable import PrettyTable
+import pandas as pd
+import random
 
 conexion = mysql.connector.connect(
     user='root', 
@@ -16,14 +15,25 @@ cursor = conexion.cursor()
 
 def getPartidosDelDia(fecha):
     query = """
-        SELECT resultados.local, resultados.visitante
-        FROM resultados
+        SELECT local, visitante, local_posicion, visitante_posicion
+        FROM resultados_ligas
         WHERE fecha = %s AND year = "2023-2024"
     """
     cursor.execute(query, (fecha,))
     resultados = cursor.fetchall()
     
-    return resultados
+    response = []
+    for data in resultados:
+        obj_response = {
+            'local': data[0],
+            'local_posicion': data[2],
+            'visitante': data[1],
+            'visitante_posicion': data[3]
+        } 
+        
+        response.append(obj_response)
+    
+    return response
     
 def contextoLocalFechaData(equipo, fecha, posicion_local, posicion_visitante):
     fecha_l_1 = fecha - 1
@@ -247,18 +257,15 @@ def getResultadoFinal(equipoLocal, equipoVisitante, todos):
     }
     
     
-    return partido
+    return partido   
+    
     
 try:
-    partidosDelDia = getPartidosDelDia('14')
-    
-    print(partidosDelDia)
-    """
-    fecha = 14
-    equipoLocal = 'valencia'
-    equipoLocalPosicion = 9
-    equipoVisitante = 'celta'
-    equipoVisitantePosicion = 18
+    fecha = 30
+    equipoLocal = 'Villarreal'
+    equipoLocalPosicion = 13
+    equipoVisitante = 'Atlético'
+    equipoVisitantePosicion = 4
     
     contextoLocalFecha = contextoLocalFechaData(equipoLocal, fecha, equipoLocalPosicion, equipoVisitantePosicion)
     resultadoContextoLocalFecha = getContextoLocalFecha(contextoLocalFecha)
@@ -271,23 +278,57 @@ try:
     todos = resultadoContextoLocalFecha + resultadoContextoVisitanteFecha + resultadoContextoRivalida
     
     resultadoFinal = getResultadoFinal(equipoLocal, equipoVisitante, todos)
-
     tabla = PrettyTable()
+    
+
+    # Inicializar DataFrame vacío
+    df = pd.DataFrame()
+
+    # Lista para almacenar los resultados
+    resultado_excel = []
+
+    # Lista para almacenar los nombres de las columnas
+    columnas_excel = []
+
+    # Verificar resultadoContextoLocalFecha
     if len(resultadoContextoLocalFecha) > 0:
         tabla.field_names = resultadoContextoLocalFecha[0].keys()
+        columnas_excel = list(resultadoContextoLocalFecha[0].keys())
+        resultado_excel.extend(resultadoContextoLocalFecha)
+
+    # Verificar resultadoContextoVisitanteFecha
     if len(resultadoContextoVisitanteFecha) > 0:
         tabla.field_names = resultadoContextoVisitanteFecha[0].keys()
+        columnas_excel = list(resultadoContextoVisitanteFecha[0].keys())
+        resultado_excel.extend(resultadoContextoVisitanteFecha)
+
+    # Verificar resultadoContextoRivalida
+    if len(resultadoContextoRivalida) > 0:
+        tabla.field_names = resultadoContextoRivalida[0].keys()
+        columnas_excel = list(resultadoContextoRivalida[0].keys())
+        resultado_excel.extend(resultadoContextoRivalida)
+
+    # Crear DataFrame con los resultados y nombres de columnas
+    df = pd.DataFrame(resultado_excel, columns=columnas_excel)
+
+    
         
+    """     
     for resultado in resultadoContextoLocalFecha:
         tabla.add_row(resultado.values())
     for resultado in resultadoContextoVisitanteFecha:
         tabla.add_row(resultado.values())
     for resultado in resultadoContextoRivalida:
-        tabla.add_row(resultado.values())  
+        tabla.add_row(resultado.values())   """
 
-    print(tabla) 
-    print(resultadoFinal) 
-    """
+    num_random = random.randint(0, 500)
+    num_random_str = str(num_random)
+    df.to_excel('resultado' + num_random_str + '.xlsx', index=False)
+    
+    print('success')
+
+    #print(tabla) 
+    #print(resultadoFinal) 
 
 except mysql.connector.Error as err:
     print("Error de MySQL: {err}")

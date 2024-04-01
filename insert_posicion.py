@@ -41,35 +41,32 @@ years = [
     '2021-2022',
     '2022-2023',
 ]
-""" years = [
-    '2010-2011',
-    '2011-2012',
-    '2012-2013'
-] """
 
-for y in years:
-    for i in range(1, 39):
-        num_string = str(i)
-        url = 'https://www.abc.es/deportes/futbol/liga-primera/' + y + '/jornada-' + num_string + '/clasificacion-resultados.html'
-        response = requests.get(url, headers=headers, cookies=cookies)
-        soup = BeautifulSoup(response.text, 'lxml')
-        articles = soup.find_all('article', class_='sd_blocks_group')
-        tbody = articles[1].find('tbody')
-        row = tbody.find_all('td', class_='sd_tbh_rb sd_al sd_tbh_team')
+for i in range(1, 16):
+    num_string = str(i)
+    """ url = 'https://www.abc.es/deportes/futbol/liga-primera/' + y + '/jornada-' + num_string + '/clasificacion-resultados.html' """
+    """ url = 'https://www.abc.es/deportes/futbol/liga-primera/jornada-' + num_string + '/clasificacion-resultados.html' """
+    
+    url = 'https://www.abc.es/deportes/futbol/liga-primera/jornada-15/clasificacion-resultados.html'
+    response = requests.get(url, headers=headers, cookies=cookies)
+    soup = BeautifulSoup(response.text, 'lxml')
+    articles = soup.find_all('article', class_='sd_blocks_group')
+    tbody = articles[1].find('tbody')
+    row = tbody.find_all('td', class_='sd_tbh_rb sd_al sd_tbh_team')
 
-        for r in row:
-            pos = r.find('strong', class_='sd_tbh_team_pos')
-            pos = pos.text.strip()
-            equipo = r.find('span')
-            equipo = equipo.text.strip()
-            jornada = {
-                'fecha': i,
-                'equipo': equipo.strip(),
-                'posicion': pos.strip(),
-                'year': y
-            } 
-            print(jornada)
-            result.append(jornada)
+    for r in row:
+        pos = r.find('strong', class_='sd_tbh_team_pos')
+        pos = pos.text.strip()
+        equipo = r.find('span')
+        equipo = equipo.text.strip()
+        jornada = {
+            'fecha': i,
+            'equipo': equipo.strip(),
+            'posicion': pos.strip(),
+            'year': '2023-2024'
+        } 
+        print(jornada)
+        result.append(jornada)
 
 try:
     for v in result:

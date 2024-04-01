@@ -20,17 +20,23 @@ scoreResult = []
 partido = {
     'fecha': '',
     'local': '',
+    'local_posicion': '',
     'visitante': '',
+    'visitante_posicion': '',
     'resultado': ''
 }
 
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 cookies = {'cookie_name': 'cookie_value'}
-url = 'https://www.abc.es/deportes/futbol/liga-primera/2023-2024/calendario.html'
+
+
+url = 'https://www.abc.es/deportes/futbol/liga-primera/jornada-15/clasificacion-resultados.html'
 response = requests.get(url, headers=headers, cookies=cookies)
 soup = BeautifulSoup(response.text, 'lxml')
 dataMain = soup.find('div', class_='sd_phase sd_phase_liga')
+print(dataMain)
+
 matchDayData = []
 if dataMain:    
     matchDayData = dataMain.find_all('article', class_='sd_block sd_shields futbol')
@@ -45,6 +51,7 @@ if matchDayData:
         matchDayClear = fecha[1]
 
         teamsVersus = matchDay.find_all('a', class_='sd_txt_black')
+        
 
         if teamsVersus:
             for teams in teamsVersus:
@@ -81,7 +88,7 @@ if matchDayData:
 try:
     for record in matchDateResults:
         print(record)
-        cursor.execute('''INSERT INTO resultados (fecha, local, visitante, resultado, year) VALUES (%s, %s, %s, %s, %s)''', 
+        cursor.execute('''INSERT INTO this_liga (fecha, local, visitante, resultado, year) VALUES (%s, %s, %s, %s, %s)''', 
         (record['fecha'], record['local'], record['visitante'], record['resultado'], record['year']))
     
     conexion.commit()
