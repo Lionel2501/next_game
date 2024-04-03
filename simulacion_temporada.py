@@ -37,7 +37,7 @@ def getPartidosDelDia(fecha):
     
     return response
     
-def contextoLocalFechaData(equipo, fecha, posicion_local, posicion_visitante):
+def getContextoLocalFechaData(equipo, fecha, posicion_local, posicion_visitante):
     fecha_l_1 = fecha - 1
     fecha_l_1 = str(fecha_l_1)
     fecha_l_2 = fecha - 2
@@ -90,7 +90,7 @@ def contextoLocalFechaData(equipo, fecha, posicion_local, posicion_visitante):
     
     return resultados
     
-def contextoVisitanteFechaData(equipo, fecha, posicion_local, posicion_visitante):
+def getContextoVisitanteFechaData(equipo, fecha, posicion_local, posicion_visitante):
     fecha_l_1 = fecha - 1
     fecha_l_1 = str(fecha_l_1)
     fecha_l_2 = fecha - 2
@@ -143,39 +143,39 @@ def contextoVisitanteFechaData(equipo, fecha, posicion_local, posicion_visitante
     
     return resultados
 
-def getContextoLocalFecha(resultadosContextoVisitante):   
+def setContextoLocalFecha(resultadosContextoVisitante):   
     response = []
     for data in resultadosContextoVisitante:
-            obj_response = {
-                'year': data[7],
-                'fecha': data[1],
-                'local': data[2],
-                'local_posicion': data[3],
-                'visitante': data[4],
-                'visitante_posicion': data[5],
-                'resultado': data[6],
-                'contexto': 'local fecha'
-            } 
-            
-            response.append(obj_response)
+        obj_response = {
+            'year': data[7],
+            'fecha': data[1],
+            'local': data[2],
+            'local_posicion': data[3],
+            'visitante': data[4],
+            'visitante_posicion': data[5],
+            'resultado': data[6],
+            'contexto': 'local fecha'
+        } 
+        
+        response.append(obj_response)
     
     return response
 
-def getContextoVisitanteFecha(resultadosContextoVisitante):   
+def setContextoVisitanteFecha(resultadosContextoVisitante):   
     response = []
     for data in resultadosContextoVisitante:
-            obj_response = {
-                'year': data[7],
-                'fecha': data[1],
-                'local': data[2],
-                'local_posicion': data[3],
-                'visitante': data[4],
-                'visitante_posicion': data[5],
-                'resultado': data[6],
-                'contexto': 'visitante fecha'
-            } 
-            
-            response.append(obj_response)
+        obj_response = {
+            'year': data[7],
+            'fecha': data[1],
+            'local': data[2],
+            'local_posicion': data[3],
+            'visitante': data[4],
+            'visitante_posicion': data[5],
+            'resultado': data[6],
+            'contexto': 'visitante fecha'
+        } 
+        
+        response.append(obj_response)
     
     return response
 
@@ -191,18 +191,18 @@ def getContextoRivalida(equipoLocal, equipoVisitante):
     
     response = []
     for data in resultados:
-            obj_response = {
-                'year': data[7],
-                'fecha': data[1],
-                'local': data[2],
-                'local_posicion': data[3],
-                'visitante': data[4],
-                'visitante_posicion': data[5],
-                'resultado': data[6],
-                'contexto': 'rivalida'
-            } 
-            
-            response.append(obj_response)
+        obj_response = {
+            'year': data[7],
+            'fecha': data[1],
+            'local': data[2],
+            'local_posicion': data[3],
+            'visitante': data[4],
+            'visitante_posicion': data[5],
+            'resultado': data[6],
+            'contexto': 'rivalida'
+        } 
+        
+        response.append(obj_response)
     
     return response
 
@@ -326,11 +326,11 @@ try:
             equipoVisitantePosicion = int(partido["visitante_posicion"])
             resultado = partido["resultado"]
             
-            contextoLocalFecha = contextoLocalFechaData(equipoLocal, fecha, equipoLocalPosicion, equipoVisitantePosicion)
-            resultadoContextoLocalFecha = getContextoLocalFecha(contextoLocalFecha)
+            contextoLocalFecha = getContextoLocalFechaData(equipoLocal, fecha, equipoLocalPosicion, equipoVisitantePosicion)
+            resultadoContextoLocalFecha = setContextoLocalFecha(contextoLocalFecha)
             
-            contextoVisitanteFecha = contextoVisitanteFechaData(equipoVisitante, fecha, equipoLocalPosicion, equipoVisitantePosicion)
-            resultadoContextoVisitanteFecha = getContextoVisitanteFecha(contextoVisitanteFecha) 
+            contextoVisitanteFecha = getContextoVisitanteFechaData(equipoVisitante, fecha, equipoLocalPosicion, equipoVisitantePosicion)
+            resultadoContextoVisitanteFecha = setContextoVisitanteFecha(contextoVisitanteFecha) 
 
             resultadoContextoRivalida = getContextoRivalida(equipoLocal, equipoVisitante)
             

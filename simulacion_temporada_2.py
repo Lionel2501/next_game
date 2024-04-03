@@ -37,7 +37,7 @@ def getPartidosDelDia(fecha):
     
     return response
     
-def contextoLocalFechaData(equipo, fecha, posicion_local, posicion_visitante):
+def getContextoLocalFechaData(equipo, fecha, posicion_local, posicion_visitante):
     fecha_l_1 = fecha - 1
     fecha_l_1 = str(fecha_l_1)
     fecha_l_2 = fecha - 2
@@ -90,7 +90,7 @@ def contextoLocalFechaData(equipo, fecha, posicion_local, posicion_visitante):
     
     return resultados
     
-def contextoVisitanteFechaData(equipo, fecha, posicion_local, posicion_visitante):
+def getContextoVisitanteFechaData(equipo, fecha, posicion_local, posicion_visitante):
     fecha_l_1 = fecha - 1
     fecha_l_1 = str(fecha_l_1)
     fecha_l_2 = fecha - 2
@@ -143,7 +143,7 @@ def contextoVisitanteFechaData(equipo, fecha, posicion_local, posicion_visitante
     
     return resultados
 
-def getContextoLocalFecha(resultadosContextoVisitante):   
+def setContextoLocalFecha(resultadosContextoVisitante):   
     response = []
     for data in resultadosContextoVisitante:
             obj_response = {
@@ -161,7 +161,7 @@ def getContextoLocalFecha(resultadosContextoVisitante):
     
     return response
 
-def getContextoVisitanteFecha(resultadosContextoVisitante):   
+def setContextoVisitanteFecha(resultadosContextoVisitante):   
     response = []
     for data in resultadosContextoVisitante:
             obj_response = {
@@ -179,35 +179,30 @@ def getContextoVisitanteFecha(resultadosContextoVisitante):
     
     return response
 
-def getContextoRivalida(equipoLocal, equipoVisitante, fecha, posicionLocal, posicionVisitante):    
+def getContextoRivalida(equipoLocal, equipoVisitante):    
     query = """
-        SELECT backup_resultados_ligas.*
-        FROM backup_resultados_ligas
-        WHERE backup_resultados_ligas.local = %s 
-            AND backup_resultados_ligas.visitante = %s 
-            AND backup_resultados_ligas.fecha BETWEEN (%s - 5) AND (%s + 5)
-            AND backup_resultados_ligas.local_posicion BETWEEN (%s - 5) AND (%s + 5)
-            AND backup_resultados_ligas.visitante_posicion BETWEEN (%s - 5) AND (%s + 5)
+        SELECT liga.*
+        FROM liga
+        WHERE liga.local = %s AND liga.visitante = %s 
     """
     
-    cursor.execute(query, (equipoLocal, equipoVisitante, fecha, fecha, posicionLocal, posicionLocal, posicionVisitante, posicionVisitante))
+    cursor.execute(query, (equipoLocal, equipoVisitante))
     resultados = cursor.fetchall()
     
     response = []
-    
     for data in resultados:
-            obj_response = {
-                'year': data[7],
-                'fecha': data[1],
-                'local': data[2],
-                'local_posicion': data[3],
-                'visitante': data[4],
-                'visitante_posicion': data[5],
-                'resultado': data[6],
-                'contexto': 'rivalida'
-            } 
-            
-            response.append(obj_response)
+        obj_response = {
+            'year': data[7],
+            'fecha': data[1],
+            'local': data[2],
+            'local_posicion': data[3],
+            'visitante': data[4],
+            'visitante_posicion': data[5],
+            'resultado': data[6],
+            'contexto': 'rivalida'
+        } 
+        
+        response.append(obj_response)
     
     return response
 
@@ -229,21 +224,20 @@ def getResultado(equipoLocal, equipoVisitante, contexto_global, fecha, score_rea
     
     for row in contexto_global:
         resultado = row['resultado']
-        if not isinstance(resultado, int):
-            partes = resultado.split(' - ')
-            resultadoLocal = partes[0]
-            resultadoVisitante = partes[1]
-            resultadoLocal = int(resultadoLocal)
-            resultadoVisitante = int(resultadoVisitante)
-            
-            if resultadoLocal > resultadoVisitante:
-                countLocal['count'] += 1
-            if resultadoVisitante > resultadoLocal:
-                countVisitante['count'] += 1
-            if resultadoLocal == resultadoVisitante:
-                countEmpate['count'] += 1
-            
-            count_total = count_total + 1
+        partes = resultado.split(' - ')
+        resultadoLocal = partes[0]
+        resultadoVisitante = partes[1]
+        resultadoLocal = int(resultadoLocal)
+        resultadoVisitante = int(resultadoVisitante)
+        
+        if resultadoLocal > resultadoVisitante:
+            countLocal['count'] += 1
+        if resultadoVisitante > resultadoLocal:
+            countVisitante['count'] += 1
+        if resultadoLocal == resultadoVisitante:
+            countEmpate['count'] += 1
+        
+        count_total = count_total + 1
             
     mayor_count = max(countEmpate['count'], countLocal['count'], countVisitante['count'])
     pronostico = 'empate'
@@ -332,14 +326,13 @@ try:
             equipoVisitantePosicion = int(partido["visitante_posicion"])
             resultado = partido["resultado"]
             
-            contextoLocalFecha = contextoLocalFechaData(equipoLocal, fecha, equipoLocalPosicion, equipoVisitantePosicion)
-            resultadoContextoLocalFecha = getContextoLocalFecha(contextoLocalFecha)
+            contextoLocalFecha = getContextoLocalFechaData(equipoLocal, fecha, equipoLocalPosicion, equipoVisitantePosicion)
+            resultadoContextoLocalFecha = setContextoLocalFecha(contextoLocalFecha)
             
-            
-            contextoVisitanteFecha = contextoVisitanteFechaData(equipoVisitante, fecha, equipoLocalPosicion, equipoVisitantePosicion)
-            resultadoContextoVisitanteFecha = getContextoVisitanteFecha(contextoVisitanteFecha) 
-            
-            resultadoContextoRivalida = getContextoRivalida(equipoLocal, equipoVisitante, fecha, equipoLocalPosicion, equipoVisitantePosicion)
+            contextoVisitanteFecha = getContextoVisitanteFechaData(equipoVisitante, fecha, equipoLocalPosicion, equipoVisitantePosicion)
+            resultadoContextoVisitanteFecha = setContextoVisitanteFecha(contextoVisitanteFecha) 
+
+            resultadoContextoRivalida = getContextoRivalida(equipoLocal, equipoVisitante)
             
             contexto_global = resultadoContextoLocalFecha + resultadoContextoVisitanteFecha + resultadoContextoRivalida
             result_data = getResultado(equipoLocal, equipoVisitante, contexto_global, fecha, resultado)
