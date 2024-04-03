@@ -265,7 +265,7 @@ try:
     partidosDelDia = getPartidosDelDia('15')
     
     for partido in partidosDelDia:
-        fecha = 12
+        fecha = 15
         equipoLocal = partido["local"]
         equipoLocalPosicion = int(partido["local_posicion"])
         equipoVisitante = partido["visitante"]
@@ -296,7 +296,7 @@ try:
         for resultado in resultadoContextoRivalida:
             tabla.add_row(resultado.values())  
 
-        print(tabla) 
+        #print(tabla) 
         print(resultadoFinal) 
     
     
