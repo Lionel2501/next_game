@@ -18,7 +18,7 @@ def getPartidosDelDia(fecha):
     query = """
         SELECT local, visitante, local_posicion, visitante_posicion, resultado
         FROM resultados_ligas
-        WHERE fecha = %s AND year = "2021-2022"
+        WHERE fecha = %s AND year = "2023-2024"
     """
     cursor.execute(query, (fecha,))
     resultados = cursor.fetchall()
@@ -250,6 +250,7 @@ def getResultado(equipoLocal, equipoVisitante, contexto_global, fecha, score_rea
     porcentaje_calcul = mayor_count / total * 100
     porcentaje = round(porcentaje_calcul, 2)
     
+    """  
     score_partes = score_real.split(' - ')
     score_local = score_partes[0]
     score_visitante = score_partes[1]
@@ -264,27 +265,28 @@ def getResultado(equipoLocal, equipoVisitante, contexto_global, fecha, score_rea
     
     valido = 0
     if resultado_real == pronostico:
-        valido = 1 
+        valido = 1  """
     
     response = {
         'local': equipoLocal,
         'visitante': equipoVisitante,
-        'resultado_real': resultado_real,
+        'resultado_real': "test",
         'pronostico': pronostico,
-        'valido': valido,
+        'valido': 0,
         'count_local': countLocal['count'],
         'count_empate': countEmpate['count'],
         'count_visitante': countVisitante['count'],
         'count_total': count_total,
         'porcentaje': porcentaje,
         'fecha': fecha,
-        'year': '2022-2023'
+        'year': '2023-2024'
     }
     
     return response
     
-def postResultadoSimulacion(result_data):   
-    cursor.execute('''INSERT INTO prono_2022 (
+def postResultadoSimulacion(result_data): 
+    print(result_data)  
+    cursor.execute('''INSERT INTO prono_fecha (
         local, 
         visitante, 
         resultado_real, 
@@ -313,33 +315,33 @@ def postResultadoSimulacion(result_data):
     
     conexion.commit()
     
-try:
-    for i in range(1, 39):      
-        i_str = str(i)
-        partidosDelDia = getPartidosDelDia(i_str)
-    
-        for partido in partidosDelDia:
-            fecha = i
-            equipoLocal = partido["local"]
-            equipoLocalPosicion = int(partido["local_posicion"])
-            equipoVisitante = partido["visitante"]
-            equipoVisitantePosicion = int(partido["visitante_posicion"])
-            resultado = partido["resultado"]
-            
-            contextoLocalFecha = getContextoLocalFechaData(equipoLocal, fecha, equipoLocalPosicion, equipoVisitantePosicion)
-            resultadoContextoLocalFecha = setContextoLocalFecha(contextoLocalFecha)
-            
-            contextoVisitanteFecha = getContextoVisitanteFechaData(equipoVisitante, fecha, equipoLocalPosicion, equipoVisitantePosicion)
-            resultadoContextoVisitanteFecha = setContextoVisitanteFecha(contextoVisitanteFecha) 
+try:    
+    i = 31
+    i_str = str(i)
+    partidosDelDia = getPartidosDelDia(i_str)
 
-            resultadoContextoRivalida = getContextoRivalida(equipoLocal, equipoVisitante)
-            
-            contexto_global = resultadoContextoLocalFecha + resultadoContextoVisitanteFecha + resultadoContextoRivalida
-            result_data = getResultado(equipoLocal, equipoVisitante, contexto_global, fecha, resultado)
-            
-            postResultadoSimulacion(result_data)
-            
-        print('success')
+    for partido in partidosDelDia:
+        fecha = i
+        equipoLocal = partido["local"]
+        equipoLocalPosicion = int(partido["local_posicion"])
+        equipoVisitante = partido["visitante"]
+        equipoVisitantePosicion = int(partido["visitante_posicion"])
+        resultado = partido["resultado"]
+        
+        contextoLocalFecha = getContextoLocalFechaData(equipoLocal, fecha, equipoLocalPosicion, equipoVisitantePosicion)
+        resultadoContextoLocalFecha = setContextoLocalFecha(contextoLocalFecha)
+        
+        contextoVisitanteFecha = getContextoVisitanteFechaData(equipoVisitante, fecha, equipoLocalPosicion, equipoVisitantePosicion)
+        resultadoContextoVisitanteFecha = setContextoVisitanteFecha(contextoVisitanteFecha) 
+
+        resultadoContextoRivalida = getContextoRivalida(equipoLocal, equipoVisitante)
+        
+        contexto_global = resultadoContextoLocalFecha + resultadoContextoVisitanteFecha + resultadoContextoRivalida
+        result_data = getResultado(equipoLocal, equipoVisitante, contexto_global, fecha, resultado)
+        
+        postResultadoSimulacion(result_data)
+        
+    print('success')
 
 except mysql.connector.Error as err:
     print("Error de MySQL: {err}")
