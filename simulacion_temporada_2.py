@@ -18,7 +18,7 @@ def getPartidosDelDia(fecha):
     query = """
         SELECT local, visitante, local_posicion, visitante_posicion, resultado
         FROM resultados_ligas
-        WHERE fecha = %s AND year = "2021-2022"
+        WHERE fecha = %s AND year = "2022-2023"
     """
     cursor.execute(query, (fecha,))
     resultados = cursor.fetchall()
@@ -280,7 +280,7 @@ def getResultado(equipoLocal, equipoVisitante, contexto_global, fecha, score_rea
     pierde_valido, pierde_porcentaje = calcular_pierde_valido_y_porcentaje(resultado_real, pierde_prono, mayor_count, countEmpate, total)
     
     response = {
-        'year': '2021-2022',
+        'year': '2022-2023',
         'fecha': fecha,
         'local': equipoLocal,
         'visitante': equipoVisitante,
@@ -337,7 +337,7 @@ def determinar_pronosticos(countLocal, countVisitante, equipoLocal, equipoVisita
     return pronostico, pierde_prono
     
 def postResultadoSimulacion(result_data):   
-    cursor.execute('''INSERT INTO prono_2022 (
+    cursor.execute('''INSERT INTO prono_resumen (
         year,
         fecha, 
         local, 

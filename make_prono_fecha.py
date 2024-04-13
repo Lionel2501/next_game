@@ -240,44 +240,17 @@ def getResultado(equipoLocal, equipoVisitante, contexto_global, fecha, score_rea
         count_games = count_games + 1
             
     mayor_count = max(countEmpate['count'], countLocal['count'], countVisitante['count'])
-    """     pronostico = 'empate'
-    pierde_prono = 'empate'
-    if mayor_count == countLocal['count']:
-        pronostico = countLocal['equipo']
-        pierde_prono = equipoVisitante
-    if mayor_count == countVisitante['count']:
-        pronostico = countVisitante['equipo']
-        pierde_prono = equipoLocal """
         
     pronostico, pierde_prono = determinar_pronosticos(countLocal, countVisitante, equipoLocal, equipoVisitante, mayor_count)
     total = len(contexto_global)
     porcentaje_calcul = mayor_count / total * 100
     porcentaje = round(porcentaje_calcul, 2)
     
-    """     score_partes = score_real.split(' - ')
-    score_local = score_partes[0]
-    score_visitante = score_partes[1]
-    score_local = int(score_local)
-    score_visitante = int(score_visitante) """
-    
     resultado_real = ''
-    
-    """ resultado_real = setResultadoReal(score_real) """
-    """     if score_local > score_visitante:
-        resultado_real  = equipoLocal
-    if score_visitante > score_local:
-        resultado_real = equipoVisitante """
     
     valido = 0
     if resultado_real == pronostico:
         valido = 1 
-        
-    """     pierde_valido = 0
-    pierde_porcentaje = 0
-    if resultado_real != pierde_prono and pierde_prono != 'empate':
-        pierde_valido = 1 
-        pierde_porcentaje_calcul = (mayor_count + countEmpate['count']) / total * 100
-        pierde_porcentaje = round(pierde_porcentaje_calcul, 2) """
         
     pierde_valido, pierde_porcentaje = calcular_pierde_valido_y_porcentaje(resultado_real, pierde_prono, mayor_count, countEmpate, total)
     
@@ -370,13 +343,13 @@ def postResultadoSimulacion(result_data):
     conexion.commit()
     
 try:
-    i_str = str('29')
+    i_str = str('31')
     partidosDelDia = getPartidosDelDia(i_str)
     
     print(partidosDelDia)
 
     for partido in partidosDelDia:
-        fecha = 29
+        fecha = 31
         equipoLocal = partido["local"]
         equipoLocalPosicion = int(partido["local_posicion"])
         equipoVisitante = partido["visitante"]
