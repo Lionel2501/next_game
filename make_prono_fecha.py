@@ -255,7 +255,7 @@ def getResultado(equipoLocal, equipoVisitante, contexto_global, fecha, score_rea
     pierde_valido, pierde_porcentaje = calcular_pierde_valido_y_porcentaje(resultado_real, pierde_prono, mayor_count, countEmpate, total)
     
     response = {
-        'year': '2021-2022',
+        'year': '2023-2024',
         'fecha': fecha,
         'local': equipoLocal,
         'visitante': equipoVisitante,
@@ -311,8 +311,33 @@ def determinar_pronosticos(countLocal, countVisitante, equipoLocal, equipoVisita
 
     return pronostico, pierde_prono
     
-def postResultadoSimulacion(result_data):   
+def postPronoFecha(result_data):   
     cursor.execute('''INSERT INTO prono_fecha (
+        year,
+        fecha, 
+        local, 
+        visitante, 
+        count_games,
+        porcentaje, 
+        pronostico, 
+        pierde_prono,
+        pierde_porcentaje
+    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)''', (
+        result_data['year'],
+        result_data['fecha'],
+        result_data['local'], 
+        result_data['visitante'], 
+        result_data['count_games'], 
+        result_data['porcentaje'], 
+        result_data['pronostico'], 
+        result_data['pierde_prono'], 
+        result_data['pierde_porcentaje'], 
+    ))
+    
+    conexion.commit()
+
+def postPronoHistory(result_data):   
+    cursor.execute('''INSERT INTO prono_history (
         year,
         fecha, 
         local, 
@@ -343,13 +368,13 @@ def postResultadoSimulacion(result_data):
     conexion.commit()
     
 try:
-    i_str = str('31')
+    i_str = str('32')
     partidosDelDia = getPartidosDelDia(i_str)
     
     print(partidosDelDia)
 
     for partido in partidosDelDia:
-        fecha = 31
+        fecha = 32
         equipoLocal = partido["local"]
         equipoLocalPosicion = int(partido["local_posicion"])
         equipoVisitante = partido["visitante"]
@@ -367,7 +392,8 @@ try:
         contexto_global = resultadoContextoLocalFecha + resultadoContextoVisitanteFecha + resultadoContextoRivalida
         result_data = getResultado(equipoLocal, equipoVisitante, contexto_global, fecha, resultado)
         
-        postResultadoSimulacion(result_data)
+        postPronoFecha(result_data)
+        postPronoHistory(result_data)
         
     print('success')
 

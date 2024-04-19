@@ -23,7 +23,10 @@ jornada = {
 }
 result = []
 
-url = 'https://www.abc.es/deportes/futbol/liga-primera/jornada-31/clasificacion-resultados.html'
+fecha = '32'
+
+url = f'https://www.abc.es/deportes/futbol/liga-primera/jornada-{fecha}/clasificacion-resultados.html'
+
 response = requests.get(url, headers=headers, cookies=cookies)
 soup = BeautifulSoup(response.text, 'lxml')
 articles = soup.find_all('article', class_='sd_blocks_group')
@@ -36,7 +39,7 @@ for r in row:
     equipo = r.find('span')
     equipo = equipo.text.strip()
     jornada = {
-        'fecha': '31',
+        'fecha': fecha,
         'equipo': equipo.strip(),
         'posicion': pos.strip(),
         'year': '2023-2024'
@@ -47,7 +50,7 @@ for r in row:
 try:
     for v in result:
         print(v)
-        cursor.execute('''INSERT INTO posiciones_2024 (fecha, equipo, posicion, year) VALUES (%s, %s, %s, %s)''', 
+        cursor.execute('''INSERT INTO posiciones (fecha, equipo, posicion, year) VALUES (%s, %s, %s, %s)''', 
         (v['fecha'], v['equipo'], v['posicion'], v['year']))
     conexion.commit()
     print("Save success")
@@ -55,4 +58,4 @@ except mysql.connector.Error as err:
     print("Error de MySQL: {err}")
 finally:
     cursor.close()
-    conexion.close() 
+    conexion.close()
