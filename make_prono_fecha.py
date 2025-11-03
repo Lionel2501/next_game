@@ -371,7 +371,7 @@ try:
     i_str = str('32')
     partidosDelDia = getPartidosDelDia(i_str)
     
-    print(partidosDelDia)
+    ###print(partidosDelDia)
 
     for partido in partidosDelDia:
         fecha = 32
@@ -386,6 +386,10 @@ try:
         
         contextoVisitanteFecha = getContextoVisitanteFechaData(equipoVisitante, fecha, equipoLocalPosicion, equipoVisitantePosicion)
         resultadoContextoVisitanteFecha = setContextoVisitanteFecha(contextoVisitanteFecha) 
+        
+        print(resultadoContextoVisitanteFecha)
+        exit()
+        
 
         resultadoContextoRivalida = getContextoRivalida(equipoLocal, equipoVisitante)
         
